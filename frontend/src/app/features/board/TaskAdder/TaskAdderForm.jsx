@@ -4,7 +4,7 @@ import TaskBasicInfo from "./TaskBasicInfo";
 import TaskDetails from "./TaskDetails";
 import TaskMetadata from "./TaskMetadata";
 
-export default function TaskAdderForm({ onClose }) {
+export default function TaskAdderForm({ onClose, defaultStatus = "todo" }) {
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [dueDate, setDueDate] = useState("");
@@ -29,7 +29,7 @@ export default function TaskAdderForm({ onClose }) {
 			tags,
 			subTasks,
 			assignee,
-			status: "todo",
+			status: defaultStatus, // Use default status
 			createdAt: new Date().toISOString(),
 		});
 

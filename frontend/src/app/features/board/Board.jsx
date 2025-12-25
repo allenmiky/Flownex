@@ -1,92 +1,72 @@
 import TaskBar from "./TaskBar/TaskBar";
 import TaskColumn from "./Column/TaskColumn";
 import { DragDropContext } from "@hello-pangea/dnd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Store } from "../../data/store";
 
 export default function Board() {
-	const [columns, setColumns] = useState([
-		{
-			id: "todo",
-			title: "To Do",
-			tasks: [
-				{ id: "1", title: "Design marketing banners" },
-				{ id: "2", title: "Write social media posts" },
-				{ id: "3", title: "Prepare campaign presentation" },
-			],
-		},
-		{
-			id: "inprogress",
-			title: "In Progress",
-			tasks: [
-				{ id: "4", title: "Create campaign timeline" },
-				{ id: "5", title: "Draft email newsletter" },
-			],
-		},
-		{
-			id: "review",
-			title: "Review",
-			tasks: [
-				{ id: "6", title: "Review campaign budget" },
-			],
-		},
-		{
-			id: "done",
-			title: "Done",
-			tasks: [
-				{ id: "7", title: "Finalize target audience" },
-				{ id: "8", title: "Set campaign goals" },
-			],
-		},
-	]);
+	const [board, setBoard] = useState(Store.getBoard());
+	const [showColumnModal, setShowColumnModal] = useState(false);
+	const [newColumnTitle, setNewColumnTitle] = useState("");
+
+	// Load and listen for updates
+	useEffect(() => {
+		const loadBoard = () => {
+			setBoard(Store.getBoard());
+		};
+
+		// Initial load
+		loadBoard();
+
+		// Listen for storage updates
+		window.addEventListener('storage-update', loadBoard);
+
+		return () => {
+			window.removeEventListener('storage-update', loadBoard);
+		};
+	}, []);
 
 	const handleDragEnd = (result) => {
 		if (!result.destination) return;
 
-		const { source, destination } = result;
+		const { source, destination, draggableId } = result;
 
 		if (source.droppableId === destination.droppableId) {
-			const columnIndex = columns.findIndex(col => col.id === source.droppableId);
-			const newTasks = Array.from(columns[columnIndex].tasks);
+			// Reorder within same column
+			const column = board.columns.find(col => col.id === source.droppableId);
+			if (!column) return;
+
+			const newTasks = Array.from(column.tasks);
 			const [movedTask] = newTasks.splice(source.index, 1);
 			newTasks.splice(destination.index, 0, movedTask);
 
-			const newColumns = [...columns];
-			newColumns[columnIndex] = {
-				...newColumns[columnIndex],
-				tasks: newTasks,
-			};
-			setColumns(newColumns);
+			// Update in Store
+			Store.reorderTasks(source.droppableId, newTasks);
 		} else {
-			const sourceColIndex = columns.findIndex(col => col.id === source.droppableId);
-			const destColIndex = columns.findIndex(col => col.id === destination.droppableId);
-
-			const sourceTasks = Array.from(columns[sourceColIndex].tasks);
-			const destTasks = Array.from(columns[destColIndex].tasks);
-
-			const [movedTask] = sourceTasks.splice(source.index, 1);
-			destTasks.splice(destination.index, 0, movedTask);
-
-			const newColumns = [...columns];
-			newColumns[sourceColIndex] = {
-				...newColumns[sourceColIndex],
-				tasks: sourceTasks,
-			};
-			newColumns[destColIndex] = {
-				...newColumns[destColIndex],
-				tasks: destTasks,
-			};
-			setColumns(newColumns);
+			// Move to different column
+			Store.moveTask(
+				draggableId,
+				source.droppableId,
+				destination.droppableId,
+				destination.index
+			);
 		}
 	};
 
-	const addNewColumn = () => {
-		const newColumnId = `column-${Date.now()}`;
-		const newColumn = {
-			id: newColumnId,
-			title: "New Column",
-			tasks: []
+	const handleAddColumn = () => {
+		if (!newColumnTitle.trim()) return;
+
+		Store.addColumn(newColumnTitle.trim());
+		setNewColumnTitle("");
+		setShowColumnModal(false);
+	};
+
+	const handleAddTask = (columnId, taskData) => {
+		const taskToAdd = {
+			...taskData,
+			status: columnId
 		};
-		setColumns([...columns, newColumn]);
+		Store.addTask(taskToAdd);
 	};
 
 	return (
@@ -96,11 +76,16 @@ export default function Board() {
 
 				{/* Board Header */}
 				<div className="flex items-center justify-between p-4 mb-4">
-					<h2 className="text-xl font-semibold text-[var(--text-primary)]">
-						Marketing Campaign
-					</h2>
+					<div>
+						<h2 className="text-xl font-semibold text-[var(--text-primary)]">
+							{board.title}
+						</h2>
+						<p className="text-sm text-[var(--text-secondary)] mt-1">
+							{board.columns.reduce((total, col) => total + col.tasks.length, 0)} total tasks
+						</p>
+					</div>
 					<div className="flex items-center gap-2">
-						<button className="px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm">
+						<button className="px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm hover:bg-[var(--bg-muted)]">
 							Filter
 						</button>
 						<button className="px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--accent)] text-white text-sm hover:bg-[var(--accent-hover)]">
@@ -111,19 +96,20 @@ export default function Board() {
 
 				{/* Columns Container */}
 				<div className="flex-1 flex gap-4 overflow-x-auto px-4 pb-20 min-h-[calc(100vh-140px)]">
-					{columns.map((column) => (
+					{board.columns.map((column) => (
 						<TaskColumn
 							key={column.id}
 							columnId={column.id}
 							title={column.title}
 							tasks={column.tasks}
+							onAddTask={(taskData) => handleAddTask(column.id, taskData)}
 						/>
 					))}
 
 					{/* Add New Column Button */}
 					<div className="flex-shrink-0 w-72">
 						<button
-							onClick={addNewColumn}
+							onClick={() => setShowColumnModal(true)}
 							className="w-full p-4 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-color)] bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] flex items-center justify-center gap-2"
 						>
 							<span className="text-xl">+</span>
@@ -131,6 +117,46 @@ export default function Board() {
 						</button>
 					</div>
 				</div>
+
+				{/* Add Column Modal */}
+				{showColumnModal && (
+					<>
+						<div className="fn-overlay" onClick={() => setShowColumnModal(false)} />
+						<div className="fn-modal fn-card" style={{ maxWidth: "400px" }}>
+							<h3 className="fn-modal-title">Add New Column</h3>
+
+							<div className="mb-4">
+								<label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+									Column Title
+								</label>
+								<input
+									autoFocus
+									className="fn-input"
+									placeholder="Enter column title..."
+									value={newColumnTitle}
+									onChange={(e) => setNewColumnTitle(e.target.value)}
+									onKeyDown={(e) => e.key === 'Enter' && handleAddColumn()}
+								/>
+							</div>
+
+							<div className="fn-actions">
+								<button
+									className="fn-btn-secondary"
+									onClick={() => setShowColumnModal(false)}
+								>
+									Cancel
+								</button>
+								<button
+									className="fn-btn"
+									onClick={handleAddColumn}
+									disabled={!newColumnTitle.trim()}
+								>
+									Add Column
+								</button>
+							</div>
+						</div>
+					</>
+				)}
 			</div>
 		</DragDropContext>
 	);
