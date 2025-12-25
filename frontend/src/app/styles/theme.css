@@ -1,0 +1,54 @@
+/* =========================
+   FLOWNEX THEME SYSTEM
+========================= */
+
+/* 🌞 LIGHT THEME */
+:root {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-muted: #f1f5f9;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+
+  --border-color: #e2e8f0;
+
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+
+  --card-bg: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* 🌙 DARK THEME */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #020617;
+  --bg-muted: #1e293b;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+
+  --border-color: #1e293b;
+
+  --accent: #818cf8;
+  --accent-hover: #6366f1;
+
+  --card-bg: #020617;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* =========================
+   GLOBAL STYLES
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}

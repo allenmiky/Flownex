@@ -1,0 +1,290 @@
+/* =========================
+   FLOWNEX DESIGN TOKENS
+========================= */
+
+:root {
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+}
+
+/* =========================
+   BUTTON SYSTEM
+========================= */
+
+.fn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  background: var(--accent);
+  color: #fff;
+
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.fn-btn:hover {
+  background: var(--accent-hover);
+}
+
+.fn-btn:active {
+  transform: scale(0.97);
+}
+
+.fn-btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* =========================
+   CARD / SURFACE
+========================= */
+
+.fn-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* =========================
+   INPUT SYSTEM
+========================= */
+
+.fn-input {
+  width: 100%;
+  padding: 10px 12px;
+
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+
+  background: var(--bg-muted);
+  color: var(--text-primary);
+
+  font-size: 14px;
+}
+
+.fn-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.fn-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* =========================
+   LAYOUT HELPERS
+========================= */
+
+.fn-flex {
+  display: flex;
+  align-items: center;
+}
+
+.fn-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fn-flex-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fn-gap-sm {
+  gap: 8px;
+}
+
+.fn-gap-md {
+  gap: 12px;
+}
+
+.fn-gap-lg {
+  gap: 16px;
+}
+
+/* =========================
+   TASK BAR (BOTTOM)
+========================= */
+
+.fn-taskbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 100%;
+  max-width: 720px;
+
+  padding: 12px 14px;
+  z-index: 50;
+}
+
+/* =========================
+   POPUP / MODAL SYSTEM
+========================= */
+
+.fn-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+
+  z-index: 100;
+}
+
+.fn-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 100%;
+  max-width: 420px;
+  padding: 16px;
+
+  z-index: 101;
+}
+
+.fn-modal-title {
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* =========================
+   MODAL ACTIONS
+========================= */
+
+.fn-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* =========================
+   SIDEBAR SYSTEM
+========================= */
+
+.fn-sidebar {
+  width: 240px;
+  height: 100vh;
+
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 12px;
+}
+
+/* Collapsed */
+.fn-sidebar.collapsed {
+  width: 72px;
+}
+
+/* =========================
+   SIDEBAR SECTIONS
+========================= */
+
+.fn-sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* =========================
+   SIDEBAR ITEM
+========================= */
+
+.fn-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  padding: 10px 12px;
+
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.fn-sidebar-item:hover {
+  background: var(--bg-muted);
+}
+
+.fn-sidebar-item span {
+  white-space: nowrap;
+}
+
+/* =========================
+   ADD BOARD
+========================= */
+
+.fn-add-board {
+  margin-top: 6px;
+  color: var(--accent);
+}
+
+/* =========================
+   SPACER
+========================= */
+
+.fn-sidebar-spacer {
+  flex: 1;
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+
+.fn-sidebar-title {
+  margin: 14px 10px 6px;
+
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  color: var(--text-secondary);
+}
+
+/* =========================
+   COLLAPSE TOGGLE
+========================= */
+
+.fn-sidebar-toggle {
+  margin-top: 8px;
+
+  padding: 10px;
+  border-radius: var(--radius-md);
+  border: none;
+
+  background: var(--bg-muted);
+  color: var(--text-primary);
+
+  cursor: pointer;
+}
