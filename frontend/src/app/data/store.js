@@ -58,20 +58,22 @@ export const Store = {
 		return this.getState().board;
 	},
 
+	// Add task to specific column
 	addTask(columnId, title) {
 		const state = this.getState();
 
-		const column = state.board.columns.find(
-			(c) => c.id === columnId
-		);
-
+		const column = state.board.columns.find((c) => c.id === columnId);
 		if (!column) return;
 
-		column.tasks.push({
+		const newTask = {
 			id: crypto.randomUUID(),
 			title,
-		});
+		};
 
+		// Add new task to the column
+		column.tasks.push(newTask);
+
+		// Update the localStorage with new task added
 		write(state);
 		return state.board;
 	},

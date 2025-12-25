@@ -1,20 +1,35 @@
+import { useState, useEffect } from "react";
 import Button from "../ui/Button";
 
-export default function Navbar() {
-  return (
-    <header
-      className="h-14 flex items-center justify-between px-6 border-b"
-      style={{ borderColor: "var(--border-color)" }}
-    >
-      <div className="font-semibold text-lg">
-        Flownex
-      </div>
+export default function Navbar({ toggleTheme }) {
+    const [theme, setTheme] = useState(
+        localStorage.getItem("theme") || "light"
+    );
 
-      <div className="flex items-center gap-3">
-        <Button variant="secondary">Board</Button>
-        <Button variant="secondary">Timeline</Button>
-        <Button variant="secondary">Calendar</Button>
-      </div>
-    </header>
-  );
+    useEffect(() => {
+        // Persist theme in localStorage
+        localStorage.setItem("theme", theme);
+        document.body.setAttribute("data-theme", theme);
+    }, [theme]);
+
+    function handleToggleTheme() {
+        setTheme((t) => (t === "light" ? "dark" : "light"));
+    }
+
+    return (
+        <header className="fn-flex fn-gap-md border-b border-gray-800" style={{ padding: "12px 16px" }}>
+            {/* Logo */}
+            <h2><a href="">Flownex</a></h2>
+
+            <div style={{ flex: 1 }} />
+
+            {/* Theme Toggle Button */}
+            <button
+                className="fn-btn fn-btn-secondary"
+                onClick={handleToggleTheme}
+            >
+                Toggle Theme
+            </button>
+        </header>
+    );
 }

@@ -1,4 +1,25 @@
 /* =========================
+   MODAL SCROLLBAR
+========================= */
+.fn-modal::-webkit-scrollbar {
+  width: 4px;
+}
+
+.fn-modal::-webkit-scrollbar-track {
+  background: var(--bg-muted);
+  border-radius: 2px;
+}
+
+.fn-modal::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.fn-modal::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* =========================
    FLOWNEX DESIGN TOKENS
 ========================= */
 
