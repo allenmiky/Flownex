@@ -30,7 +30,7 @@ export default function Navbar() {
 
             {/* Left Section */}
             <h2 className="font-bold" style={{ margin: 0 }}>
-                <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Flownex</a>
+                <a href="/"> <img className="logo" src="https://8upload.com//image/00a51167779aea7a/logo.png" alt="" /> </a>
             </h2>
 
             {/* Right Section */}
