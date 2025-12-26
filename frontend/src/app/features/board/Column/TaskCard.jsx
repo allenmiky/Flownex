@@ -30,12 +30,12 @@ export default function TaskCard({ task, index }) {
 						</p>
 					)}
 
-					{/* Tags */}
+					{/* Tags - FIXED KEYS HERE */}
 					{task.tags && task.tags.length > 0 && (
 						<div className="flex flex-wrap gap-1 mb-2">
-							{task.tags.slice(0, 2).map((tag) => (
+							{task.tags.slice(0, 2).map((tag, tagIndex) => (
 								<span
-									key={tag.id}
+									key={tag.id || `tag-${tagIndex}`} // FIX: Added unique key
 									className="px-2 py-0.5 rounded text-xs text-white"
 									style={{ background: tag.color }}
 								>
@@ -84,7 +84,7 @@ export default function TaskCard({ task, index }) {
 								</div>
 							)}
 
-							{/* Comments/Attachments placeholders */}
+							{/* Icons placeholders */}
 							<div className="flex items-center gap-3">
 								<span className="flex items-center gap-1">
 									<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
