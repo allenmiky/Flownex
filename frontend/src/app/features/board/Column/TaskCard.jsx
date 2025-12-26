@@ -8,8 +8,8 @@ export default function TaskCard({ task, index }) {
 					ref={provided.innerRef}
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
-					className="rounded-[var(--radius-lg)] border border-[var(--border-color)] bg-[var(--card-bg)] p-3 mb-2 cursor-grab active:cursor-grabbing shadow-[var(--shadow-sm)] hover:shadow-md"
-				>
+					className="rounded-[var(--radius-lg)] border border-[var(--border-color)] bg-[var(--card-bg)] p-3 mb-2 cursor-grab active:cursor-grabbing shadow-[var(--shadow-sm)] hover:shadow-md">
+
 					{/* Priority indicator */}
 					{task.priority === 'high' && (
 						<div className="w-full h-1 bg-red-500 rounded-t mb-2"></div>
@@ -33,14 +33,16 @@ export default function TaskCard({ task, index }) {
 					{/* Tags */}
 					{task.tags && task.tags.length > 0 && (
 						<div className="flex flex-wrap gap-1 mb-2">
-							{task.tags.slice(0, 2).map((tag, idx) => (
+							{task.tags.slice(0, 2).map((tag) => (
 								<span
-									key={idx}
-									className="px-2 py-0.5 rounded text-xs bg-[var(--bg-muted)] text-[var(--text-secondary)]"
+									key={tag.id}
+									className="px-2 py-0.5 rounded text-xs text-white"
+									style={{ background: tag.color }}
 								>
-									{tag}
+									{tag.name}
 								</span>
 							))}
+
 							{task.tags.length > 2 && (
 								<span className="px-2 py-0.5 rounded text-xs bg-[var(--bg-muted)] text-[var(--text-secondary)]">
 									+{task.tags.length - 2}

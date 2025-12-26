@@ -168,6 +168,18 @@
   z-index: 100;
 }
 
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .fn-modal {
   position: fixed;
   top: 50%;
@@ -175,10 +187,14 @@
   transform: translate(-50%, -50%);
 
   width: 100%;
-  max-width: 420px;
-  padding: 16px;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
 
+  padding: 20px;
   z-index: 101;
+
+  animation: modalFadeIn 0.18s ease-out;
 }
 
 .fn-modal-title {
@@ -199,6 +215,100 @@
 }
 
 /* =========================
+   PANEL SYSTEM
+========================= */
+
+@keyframes panelExpand {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fn-panel {
+  animation: panelExpand 0.18s ease-out;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.fn-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* =========================
+   ACTION BUTTONS (TOP BAR)
+========================= */
+
+.fn-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  font-size: 13px;
+  cursor: pointer;
+
+  transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.fn-action-btn:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.fn-action-btn:active {
+  transform: scale(0.97);
+}
+
+/* =========================
+   CHIP / LABELS
+========================= */
+
+@keyframes chipPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fn-chip {
+  animation: chipPop 0.15s ease-out;
+}
+
+/* =========================
+   CHECKLIST ITEM
+========================= */
+
+@keyframes listFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fn-list-item {
+  animation: listFadeIn 0.15s ease-out;
+}
+
+/* =========================
    SIDEBAR SYSTEM
 ========================= */
 
@@ -211,101 +321,36 @@
 
   display: flex;
   flex-direction: column;
-
   padding: 12px;
 }
 
-/* Collapsed */
 .fn-sidebar.collapsed {
   width: 72px;
 }
-
-/* =========================
-   SIDEBAR SECTIONS
-========================= */
-
-.fn-sidebar-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* =========================
-   SIDEBAR ITEM
-========================= */
 
 .fn-sidebar-item {
   display: flex;
   align-items: center;
   gap: 12px;
 
-  width: 100%;
   padding: 10px 12px;
-
   border-radius: var(--radius-md);
-  border: none;
   background: transparent;
 
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary);
-
   cursor: pointer;
-  transition: background 0.15s ease;
+
+  transition: background 0.15s ease, transform 0.12s ease;
 }
 
 .fn-sidebar-item:hover {
   background: var(--bg-muted);
+  transform: translateX(2px);
 }
-
-.fn-sidebar-item span {
-  white-space: nowrap;
-}
-
-/* =========================
-   ADD BOARD
-========================= */
-
-.fn-add-board {
-  margin-top: 6px;
-  color: var(--accent);
-}
-
-/* =========================
-   SPACER
-========================= */
 
 .fn-sidebar-spacer {
   flex: 1;
 }
 
-/* =========================
-   SECTION TITLE
-========================= */
 
-.fn-sidebar-title {
-  margin: 14px 10px 6px;
-
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-
-  color: var(--text-secondary);
-}
-
-/* =========================
-   COLLAPSE TOGGLE
-========================= */
-
-.fn-sidebar-toggle {
-  margin-top: 8px;
-
-  padding: 10px;
-  border-radius: var(--radius-md);
-  border: none;
-
-  background: var(--bg-muted);
-  color: var(--text-primary);
-
-  cursor: pointer;
-}
