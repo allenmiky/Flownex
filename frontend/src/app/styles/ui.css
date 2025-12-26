@@ -19,6 +19,38 @@
   background: var(--text-secondary);
 }
 
+/* SCROLL BAR */
+/* Poori app ke liye minimal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  /* Vertical scrollbar ki width */
+  height: 6px;
+  /* Horizontal scrollbar ki height */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  /* Background bilkul saaf rakha hai */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  /* Aapki theme wala dark grey color */
+  border-radius: 10px;
+  /* Round corners taake minimal lage */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #798df2;
+  /* Hover karne par aapka primary blue color dikhega */
+}
+
+/* Firefox ke liye (Optional) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #30363d transparent;
+}
+
 /* =========================
    FLOWNEX DESIGN TOKENS
 ========================= */
@@ -352,5 +384,3 @@
 .fn-sidebar-spacer {
   flex: 1;
 }
-
-
