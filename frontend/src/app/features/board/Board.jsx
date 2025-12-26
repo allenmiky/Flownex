@@ -39,7 +39,7 @@ export default function Board() {
 			<div className="h-screen flex flex-col bg-[var(--bg-primary)] overflow-hidden relative">
 
 				{/* 1. Header Section: Static (Top par hi rahega) */}
-				<div className="flex items-center justify-between p-6 pb-4 flex-shrink-0">
+				<div className="flex items-center justify-between p-6 pb-4 pt-0 flex-shrink-0">
 					<div>
 						<h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
 							{board.title}
