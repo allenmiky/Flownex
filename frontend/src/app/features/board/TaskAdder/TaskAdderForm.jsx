@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Icons } from "../../../../icons";
 import LabelsPanel from "./panels/LabelsPanel";
 import DatesPanel from "./panels/DatesPanel";
@@ -8,6 +9,7 @@ import { Store } from "../../../data/store";
 import { Maximize2, Minimize2 } from "lucide-react"; // Naye icons for full screen
 
 export default function TaskAdderForm({ onClose, defaultStatus = "todo" }) {
+	const { id: boardId } = useParams();
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [tags, setTags] = useState([]);
@@ -46,14 +48,22 @@ export default function TaskAdderForm({ onClose, defaultStatus = "todo" }) {
 
 	const addTask = () => {
 		if (!title.trim()) return;
-		Store.addTask({
-			title, description, tags, subTasks, assignee, dueDate, priority,
+
+		Store.addTask(boardId, {
+			title,
+			description,
+			tags,
+			subTasks,
+			assignee,
+			dueDate,
+			priority,
 			status: defaultStatus,
 			createdAt: new Date().toISOString(),
 		});
-		window.dispatchEvent(new Event("storage-update"));
+
 		onClose();
 	};
+
 
 	return (
 		<>

@@ -18,7 +18,7 @@ export default function Navbar() {
         <header
             className="fn-flex border-b border-gray-800 transition-colors duration-300"
             style={{
-                padding: "12px 16px",
+                padding: "2px 16px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",

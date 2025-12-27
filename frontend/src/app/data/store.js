@@ -14,282 +14,144 @@ function write(data) {
 	localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+function emit() {
+	window.dispatchEvent(new Event("storage-update"));
+}
+
 /* ------------------ INIT ------------------ */
+function createBoard(id, title) {
+	return {
+		id,
+		title,
+		columns: [
+			{ id: "todo", title: "To Do", tasks: [] },
+			{ id: "inprogress", title: "In Progress", tasks: [] },
+			{ id: "review", title: "Review", tasks: [] },
+			{ id: "done", title: "Done", tasks: [] },
+		],
+	};
+}
+
 function createInitialState() {
 	return {
-		board: {
-			id: "default",
-			title: "Marketing Campaign",
-			columns: [
-				{
-					id: "todo",
-					title: "To Do",
-					tasks: [],
-				},
-				{
-					id: "inprogress",
-					title: "In Progress",
-					tasks: [],
-				},
-				{
-					id: "review",
-					title: "Review",
-					tasks: [],
-				},
-				{
-					id: "done",
-					title: "Done",
-					tasks: [],
-				},
-			],
-		},
+		boards: [
+			createBoard("default", "Main Board"),
+		],
 	};
+}
+
+/* ------------------ HELPERS ------------------ */
+function getStateSafe() {
+	const data = read();
+	if (data?.boards) return data;
+
+	const fresh = createInitialState();
+	write(fresh);
+	return fresh;
+}
+
+function getBoard(state, boardId = "default") {
+	return state.boards.find(b => b.id === boardId);
 }
 
 /* ------------------ PUBLIC API ------------------ */
 export const Store = {
+
+	/* ---------- STATE ---------- */
 	getState() {
-		const data = read();
-		if (data) return data;
-
-		const fresh = createInitialState();
-		write(fresh);
-		return fresh;
+		return getStateSafe();
 	},
 
-	getBoard() {
-		return this.getState().board;
+	/* ---------- BOARDS ---------- */
+	getBoards() {
+		return getStateSafe().boards;
 	},
 
-	// Add task with all details
-	addTask(taskData) {
-		const state = this.getState();
+	getBoardById(boardId = "default") {
+		const state = getStateSafe();
+		return getBoard(state, boardId);
+	},
 
-		const column = state.board.columns.find((c) => c.id === taskData.status || "todo");
-		if (!column) return null;
+	addBoard(title) {
+		const state = getStateSafe();
+		const id = Date.now().toString();
 
-		const newTask = {
+		state.boards.push(createBoard(id, title));
+		write(state);
+		emit();
+
+		return id;
+	},
+
+	/* ---------- TASKS ---------- */
+	addTask(boardId, task) {
+		const state = getStateSafe();
+		const board = getBoard(state, boardId);
+		if (!board) return;
+
+		const column = board.columns.find(
+			c => c.id === (task.status || "todo")
+		);
+		if (!column) return;
+
+		column.tasks.push({
 			id: crypto.randomUUID(),
-			title: taskData.title,
-			description: taskData.description || "",
-			dueDate: taskData.dueDate || "",
-			priority: taskData.priority || "medium",
-			tags: taskData.tags || [],
-			subTasks: taskData.subTasks || [],
-			assignee: taskData.assignee || "",
-			status: taskData.status || "todo",
-			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
-		};
-
-		column.tasks.push(newTask);
-		write(state);
-
-		// Dispatch storage update event
-		window.dispatchEvent(new Event("storage-update"));
-
-		return newTask;
-	},
-
-	// Update existing task
-	updateTask(taskId, updates) {
-		const state = this.getState();
-		let taskFound = false;
-
-		// Find task in any column
-		for (const column of state.board.columns) {
-			const taskIndex = column.tasks.findIndex(t => t.id === taskId);
-			if (taskIndex !== -1) {
-				// If status changed, move task to new column
-				if (updates.status && updates.status !== column.id) {
-					// Remove from current column
-					const [task] = column.tasks.splice(taskIndex, 1);
-
-					// Add to new column
-					const newColumn = state.board.columns.find(c => c.id === updates.status);
-					if (newColumn) {
-						task.status = updates.status;
-						Object.assign(task, updates);
-						task.updatedAt = new Date().toISOString();
-						newColumn.tasks.push(task);
-					}
-				} else {
-					// Update in same column
-					Object.assign(column.tasks[taskIndex], updates, {
-						updatedAt: new Date().toISOString()
-					});
-				}
-				taskFound = true;
-				break;
-			}
-		}
-
-		if (taskFound) {
-			write(state);
-			window.dispatchEvent(new Event("storage-update"));
-			return true;
-		}
-		return false;
-	},
-
-	// Delete task
-	deleteTask(taskId) {
-		const state = this.getState();
-		let deleted = false;
-
-		for (const column of state.board.columns) {
-			const initialLength = column.tasks.length;
-			column.tasks = column.tasks.filter(t => t.id !== taskId);
-			if (column.tasks.length < initialLength) {
-				deleted = true;
-				break;
-			}
-		}
-
-		if (deleted) {
-			write(state);
-			window.dispatchEvent(new Event("storage-update"));
-			return true;
-		}
-		return false;
-	},
-
-	// Move task between columns (for drag & drop)
-	moveTask(taskId, sourceColumnId, destinationColumnId, destinationIndex) {
-		const state = this.getState();
-
-		const sourceColumn = state.board.columns.find(c => c.id === sourceColumnId);
-		const destinationColumn = state.board.columns.find(c => c.id === destinationColumnId);
-
-		if (!sourceColumn || !destinationColumn) return false;
-
-		const taskIndex = sourceColumn.tasks.findIndex(t => t.id === taskId);
-		if (taskIndex === -1) return false;
-
-		const [task] = sourceColumn.tasks.splice(taskIndex, 1);
-
-		// Update task status
-		task.status = destinationColumnId;
-		task.updatedAt = new Date().toISOString();
-
-		// Insert at specified index
-		destinationColumn.tasks.splice(destinationIndex, 0, task);
-
-		write(state);
-		window.dispatchEvent(new Event("storage-update"));
-		return true;
-	},
-
-	// Reorder tasks within same column
-	reorderTasks(columnId, newTaskOrder) {
-		const state = this.getState();
-		const column = state.board.columns.find(c => c.id === columnId);
-
-		if (!column) return false;
-
-		// Update tasks array with new order
-		column.tasks = newTaskOrder;
-
-		write(state);
-		window.dispatchEvent(new Event("storage-update"));
-		return true;
-	},
-
-	// Add new column
-	addColumn(title) {
-		const state = this.getState();
-
-		const newColumn = {
-			id: `column-${crypto.randomUUID()}`,
-			title: title || "New Column",
-			tasks: []
-		};
-
-		state.board.columns.push(newColumn);
-		write(state);
-		window.dispatchEvent(new Event("storage-update"));
-		return newColumn;
-	},
-
-	// Update column
-	updateColumn(columnId, updates) {
-		const state = this.getState();
-		const column = state.board.columns.find(c => c.id === columnId);
-
-		if (!column) return false;
-
-		Object.assign(column, updates);
-		write(state);
-		window.dispatchEvent(new Event("storage-update"));
-		return true;
-	},
-
-	// Delete column (moves tasks to todo column)
-	deleteColumn(columnId) {
-		const state = this.getState();
-		const columnIndex = state.board.columns.findIndex(c => c.id === columnId);
-
-		if (columnIndex === -1) return false;
-
-		const column = state.board.columns[columnIndex];
-		const todoColumn = state.board.columns.find(c => c.id === "todo");
-
-		// Move all tasks to todo column
-		if (todoColumn && column.tasks.length > 0) {
-			column.tasks.forEach(task => {
-				task.status = "todo";
-				task.updatedAt = new Date().toISOString();
-			});
-			todoColumn.tasks.push(...column.tasks);
-		}
-
-		// Remove the column
-		state.board.columns.splice(columnIndex, 1);
-
-		write(state);
-		window.dispatchEvent(new Event("storage-update"));
-		return true;
-	},
-
-	// Get all tasks (for filtering/search)
-	getAllTasks() {
-		const state = this.getState();
-		const allTasks = [];
-
-		state.board.columns.forEach(column => {
-			column.tasks.forEach(task => {
-				allTasks.push({ ...task, columnId: column.id });
-			});
+			title: task.title,
+			status: column.id,
 		});
 
-		return allTasks;
-	},
-
-	// Update entire board
-	updateBoard(board) {
-		const state = this.getState();
-		state.board = board;
 		write(state);
-		window.dispatchEvent(new Event("storage-update"));
+		emit();
 	},
 
-	// Reset to initial state
-	reset() {
-		localStorage.removeItem(STORAGE_KEY);
-		window.dispatchEvent(new Event("storage-update"));
+	moveTask(taskId, fromCol, toCol, index, boardId) {
+		const state = getStateSafe();
+		const board = getBoard(state, boardId);
+		if (!board) return;
+
+		const source = board.columns.find(c => c.id === fromCol);
+		const target = board.columns.find(c => c.id === toCol);
+		if (!source || !target) return;
+
+		const taskIndex = source.tasks.findIndex(t => t.id === taskId);
+		if (taskIndex === -1) return;
+
+		const [task] = source.tasks.splice(taskIndex, 1);
+		task.status = toCol;
+
+		target.tasks.splice(index, 0, task);
+
+		write(state);
+		emit();
 	},
 
-	// Export board data
-	exportData() {
-		return this.getState();
+	reorderTasks(colId, tasks, boardId) {
+		const state = getStateSafe();
+		const board = getBoard(state, boardId);
+		if (!board) return;
+
+		const column = board.columns.find(c => c.id === colId);
+		if (!column) return;
+
+		column.tasks = tasks;
+
+		write(state);
+		emit();
 	},
 
-	// Import board data
-	importData(data) {
-		if (!data || !data.board) return false;
+	/* ---------- COLUMNS ---------- */
+	addColumn(boardId, title) {
+		const state = getStateSafe();
+		const board = getBoard(state, boardId);
+		if (!board) return;
 
-		write(data);
-		window.dispatchEvent(new Event("storage-update"));
-		return true;
-	}
+		board.columns.push({
+			id: crypto.randomUUID(),
+			title,
+			tasks: [],
+		});
+
+		write(state);
+		emit();
+	},
 };
