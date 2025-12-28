@@ -124,32 +124,49 @@ export const Store = {
 		return newTask;
 	},
 
+	getTaskById(taskId) {
+		const state = this.getState();
+		for (const board of state.boards) {
+			for (const column of board.columns) {
+				const task = column.tasks.find(t => t.id === taskId);
+				if (task) return task;
+			}
+		}
+		return null;
+	},
+
 	updateTask(taskId, updates) {
 		const state = this.getState();
+		let taskFound = false;
 
-		for (const column of state.board.columns) {
-			const index = column.tasks.findIndex(t => t.id === taskId);
-			if (index === -1) continue;
+		for (const board of state.boards) {
+			for (const column of board.columns) {
+				const index = column.tasks.findIndex(t => t.id === taskId);
+				if (index !== -1) {
+					const task = column.tasks[index];
 
-			const task = column.tasks[index];
+					// Agar status change ho raha hai toh column badalna hoga
+					if (updates.status && updates.status !== column.id) {
+						column.tasks.splice(index, 1);
+						const targetCol = board.columns.find(c => c.id === updates.status);
+						if (targetCol) {
+							Object.assign(task, updates);
+							targetCol.tasks.push(task);
+						}
+					} else {
+						// Sirf details update karein
+						Object.assign(task, updates);
+					}
 
-			if (updates.status && updates.status !== column.id) {
-				column.tasks.splice(index, 1);
-
-				const target = state.board.columns.find(
-					c => c.id === updates.status
-				);
-				if (!target) return false;
-
-				task.status = updates.status;
-				Object.assign(task, updates);
-				task.updatedAt = new Date().toISOString();
-				target.tasks.push(task);
-			} else {
-				Object.assign(task, updates);
-				task.updatedAt = new Date().toISOString();
+					task.updatedAt = new Date().toISOString();
+					taskFound = true;
+					break;
+				}
 			}
+			if (taskFound) break;
+		}
 
+		if (taskFound) {
 			write(state);
 			window.dispatchEvent(new Event("storage-update"));
 			return true;
@@ -157,6 +174,32 @@ export const Store = {
 		return false;
 	},
 
+	// store.js mein ye function add karein:
+
+	deleteTask(taskId) {
+		const state = this.getState();
+		let taskFound = false;
+
+		for (const board of state.boards) {
+			for (const column of board.columns) {
+				const index = column.tasks.findIndex(t => t.id === taskId);
+				if (index !== -1) {
+					column.tasks.splice(index, 1);
+					taskFound = true;
+					break;
+				}
+			}
+			if (taskFound) break;
+		}
+
+		if (taskFound) {
+			write(state);
+			window.dispatchEvent(new Event("storage-update"));
+			return true;
+		}
+		return false;
+	},
+	
 	moveTask(taskId, fromCol, toCol, index, boardId) {
 		const state = getStateSafe();
 		const board = getBoard(state, boardId);

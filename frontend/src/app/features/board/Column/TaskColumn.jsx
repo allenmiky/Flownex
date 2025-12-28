@@ -2,7 +2,7 @@ import { Droppable } from "@hello-pangea/dnd";
 import TaskCard from "./TaskCard";
 import { useState } from "react";
 
-export default function TaskColumn({ columnId, title, tasks, onAddTask }) {
+export default function TaskColumn({ columnId, title, tasks, onAddTask}) {
 	const [showTaskAdder, setShowTaskAdder] = useState(false);
 
 	return (

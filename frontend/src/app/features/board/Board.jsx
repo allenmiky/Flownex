@@ -6,10 +6,10 @@ import { Store } from "../../data/store";
 import { useParams } from "react-router-dom";
 
 export default function Board() {
-	const { id } = useParams(); // 👈 board id from URL
-	const [board, setBoard] = useState(() =>
-		Store.getBoardById(id)
-	);
+	const { id } = useParams();
+	const [board, setBoard] = useState(() => Store.getBoardById(id));
+	const [selectedTask, setSelectedTask] = useState(null);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	useEffect(() => {
 		const loadBoard = () => {
@@ -18,8 +18,7 @@ export default function Board() {
 
 		loadBoard();
 		window.addEventListener("storage-update", loadBoard);
-		return () =>
-			window.removeEventListener("storage-update", loadBoard);
+		return () => window.removeEventListener("storage-update", loadBoard);
 	}, [id]);
 
 	const handleDragEnd = (result) => {
@@ -53,7 +52,16 @@ export default function Board() {
 		}
 	};
 
+	// ✅ IMPORTANT: Yeh function properly define karein
+	const handleTaskClick = (task) => {
+		console.log("🎯 Task clicked in Board.jsx:", task);
+		setSelectedTask(task);
+		setIsModalOpen(true);
+	};
+
 	if (!board) return null;
+
+	console.log("🏢 Board rendering, passing handleTaskClick to columns");
 
 	return (
 		<DragDropContext onDragEnd={handleDragEnd}>
@@ -70,17 +78,57 @@ export default function Board() {
 
 				{/* Columns */}
 				<div className="flex-1 flex gap-6 overflow-x-auto px-6">
-					{board.columns.map(column => (
-						<TaskColumn
-							key={column.id}
-							columnId={column.id}
-							title={column.title}
-							tasks={column.tasks}
-						/>
-					))}
+					{board.columns.map(column => {
+						console.log("📥 Passing onTaskClick to column:", column.id);
+						return (
+							<TaskColumn
+								key={column.id}
+								columnId={column.id}
+								title={column.title}
+								tasks={column.tasks}
+								onTaskClick={handleTaskClick} // ✅ YEH LINE BHI IMPORTANT
+							/>
+						);
+					})}
 				</div>
 
 				<TaskBar boardId={board.id} />
+
+				{/* ✅ Simple Test Modal */}
+				{isModalOpen && selectedTask && (
+					<div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center">
+						<div className="bg-white rounded-lg p-6 w-96 max-w-md">
+							<h2 className="text-xl font-bold mb-4">Task Details</h2>
+							<div className="space-y-3">
+								<p><strong>Title:</strong> {selectedTask.title}</p>
+								<p><strong>ID:</strong> {selectedTask.id}</p>
+								<p><strong>Status:</strong> {selectedTask.status}</p>
+								<p><strong>Priority:</strong> {selectedTask.priority}</p>
+								{selectedTask.description && (
+									<p><strong>Description:</strong> {selectedTask.description}</p>
+								)}
+							</div>
+							<div className="flex justify-end gap-3 mt-6">
+								<button
+									onClick={() => setIsModalOpen(false)}
+									className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+								>
+									Close
+								</button>
+								<button
+									onClick={() => {
+										// Edit functionality yahan add karein
+										console.log("Edit task:", selectedTask.id);
+										setIsModalOpen(false);
+									}}
+									className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+								>
+									Edit Task
+								</button>
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 		</DragDropContext>
 	);
