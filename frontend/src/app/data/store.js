@@ -34,11 +34,10 @@ function createBoard(id, title) {
 
 function createInitialState() {
 	return {
-		boards: [
-			createBoard("default", "Main Board"),
-		],
+		boards: [],  
 	};
 }
+
 
 /* ------------------ HELPERS ------------------ */
 function getStateSafe() {
@@ -199,7 +198,7 @@ export const Store = {
 		}
 		return false;
 	},
-	
+
 	moveTask(taskId, fromCol, toCol, index, boardId) {
 		const state = getStateSafe();
 		const board = getBoard(state, boardId);
