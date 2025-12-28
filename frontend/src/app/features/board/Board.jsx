@@ -52,20 +52,18 @@ export default function Board() {
 		}
 	};
 
-	// ✅ IMPORTANT: Yeh function properly define karein
+	// ✅ FIXED: Handle task click properly
 	const handleTaskClick = (task) => {
-		console.log("🎯 Task clicked in Board.jsx:", task);
+		console.log("🎯 Task clicked:", task.title);
 		setSelectedTask(task);
 		setIsModalOpen(true);
 	};
 
 	if (!board) return null;
 
-	console.log("🏢 Board rendering, passing handleTaskClick to columns");
-
 	return (
 		<DragDropContext onDragEnd={handleDragEnd}>
-			<div className="h-screen flex flex-col bg-[var(--bg-primary)] overflow-hidden relative">
+			<div className="h-screen flex flex-col bg-[var(--bg-primary)] overflow-hidden">
 
 				{/* Header */}
 				<div className="flex items-center justify-between p-6 pb-4 pt-0">
@@ -76,25 +74,22 @@ export default function Board() {
 					</div>
 				</div>
 
-				{/* Columns */}
-				<div className="flex-1 flex gap-6 overflow-x-auto px-6">
-					{board.columns.map(column => {
-						console.log("📥 Passing onTaskClick to column:", column.id);
-						return (
-							<TaskColumn
-								key={column.id}
-								columnId={column.id}
-								title={column.title}
-								tasks={column.tasks}
-								onTaskClick={handleTaskClick} // ✅ YEH LINE BHI IMPORTANT
-							/>
-						);
-					})}
+				{/* ✅ FIXED: Columns container - REMOVE overflow-x-auto */}
+				<div className="flex-1 flex gap-6 px-6">
+					{board.columns.map(column => (
+						<TaskColumn
+							key={column.id}
+							columnId={column.id}
+							title={column.title}
+							tasks={column.tasks}
+							onTaskClick={handleTaskClick} // ✅ Prop properly passed
+						/>
+					))}
 				</div>
 
 				<TaskBar boardId={board.id} />
 
-				{/* ✅ Simple Test Modal */}
+				{/* ✅ Modal for task details */}
 				{isModalOpen && selectedTask && (
 					<div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center">
 						<div className="bg-white rounded-lg p-6 w-96 max-w-md">
@@ -103,9 +98,12 @@ export default function Board() {
 								<p><strong>Title:</strong> {selectedTask.title}</p>
 								<p><strong>ID:</strong> {selectedTask.id}</p>
 								<p><strong>Status:</strong> {selectedTask.status}</p>
-								<p><strong>Priority:</strong> {selectedTask.priority}</p>
+								<p><strong>Priority:</strong> {selectedTask.priority || 'none'}</p>
 								{selectedTask.description && (
 									<p><strong>Description:</strong> {selectedTask.description}</p>
+								)}
+								{selectedTask.dueDate && (
+									<p><strong>Due Date:</strong> {new Date(selectedTask.dueDate).toLocaleDateString()}</p>
 								)}
 							</div>
 							<div className="flex justify-end gap-3 mt-6">
@@ -117,9 +115,10 @@ export default function Board() {
 								</button>
 								<button
 									onClick={() => {
-										// Edit functionality yahan add karein
+										// Yahan aap edit modal open kar sakte hain
 										console.log("Edit task:", selectedTask.id);
 										setIsModalOpen(false);
+										// Yahan aap TaskAdderForm open kar sakte hain edit mode mein
 									}}
 									className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
 								>

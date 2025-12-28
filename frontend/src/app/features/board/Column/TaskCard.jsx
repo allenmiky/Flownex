@@ -1,33 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Draggable } from "@hello-pangea/dnd";
 import TaskAdderForm from "../TaskAdder/TaskAdderForm";
 
 export default function TaskCard({ task, index, onTaskClick }) {
 	const [showModal, setShowModal] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
 
-	// ✅ DEBUG: Console mein check karein
-	console.log("TaskCard rendered:", {
-		taskId: task.id,
-		taskTitle: task.title,
-		onTaskClickExists: !!onTaskClick,
-		onTaskClickType: typeof onTaskClick
-	});
+	// ✅ Detect if dragging
+	useEffect(() => {
+		const handleDragStart = () => setIsDragging(true);
+		const handleDragEnd = () => setIsDragging(false);
 
-	// ✅ Click handler function - FIXED
+		document.addEventListener('dragstart', handleDragStart);
+		document.addEventListener('dragend', handleDragEnd);
+
+		return () => {
+			document.removeEventListener('dragstart', handleDragStart);
+			document.removeEventListener('dragend', handleDragEnd);
+		};
+	}, []);
+
+	// ✅ Click handler - FIXED for draggable conflict
 	const handleClick = (e) => {
-		e.stopPropagation(); // ✅ IMPORTANT: Draggable conflict ko rokta hai
-		e.preventDefault();
+		// Agar dragging ho raha hai toh click ignore karein
+		if (isDragging) {
+			console.log("Ignoring click during drag");
+			return;
+		}
 
-		console.log("🖱️ TaskCard clicked, onTaskClick:", onTaskClick);
+		// IMPORTANT: Stop propagation
+		e.stopPropagation();
+		
+		console.log("🖱️ TaskCard clicked");
 
-		// Priority: Use prop if available, else open modal directly
+		// Agar prop available hai toh use karein
 		if (onTaskClick && typeof onTaskClick === 'function') {
 			console.log("📞 Calling onTaskClick prop");
 			onTaskClick(task);
 		} else {
-			console.log("🚀 Opening modal directly from TaskCard");
+			console.log("🚀 Opening modal directly");
 			setShowModal(true);
 		}
+	};
+
+	// ✅ Handle mouse down for better drag detection
+	const handleMouseDown = (e) => {
+		// Agar right-click ya middle-click hai toh ignore karein
+		if (e.button !== 0) return;
+		
+		// Thoda delay dekar check karein ki drag ho raha hai ya click
+		setTimeout(() => {
+			if (!isDragging) {
+				// Normal click hai
+			}
+		}, 150);
 	};
 
 	return (
@@ -38,10 +64,14 @@ export default function TaskCard({ task, index, onTaskClick }) {
 						ref={provided.innerRef}
 						{...provided.draggableProps}
 						{...provided.dragHandleProps}
-						className={`rounded-[var(--radius-lg)] border border-[var(--border-color)] bg-[var(--card-bg)] p-3 mb-2 cursor-grab active:cursor-grabbing shadow-[var(--shadow-sm)] hover:shadow-md ${snapshot.isDragging ? 'opacity-80 rotate-2' : ''
-							}`}
+						className={`rounded-[var(--radius-lg)] border border-[var(--border-color)] bg-[var(--card-bg)] p-3 mb-2 shadow-[var(--shadow-sm)] hover:shadow-md transition-all ${
+							snapshot.isDragging 
+								? 'opacity-80 rotate-1 scale-105 cursor-grabbing' 
+								: 'cursor-grab'
+						}`}
 						onClick={handleClick}
-						style={{ cursor: 'pointer' }} // ✅ Extra visual cue
+						onMouseDown={handleMouseDown}
+						// ✅ Remove inline style - yeh conflict kar sakta hai
 					>
 						{/* Priority indicator */}
 						{task.priority === 'high' && (
@@ -148,7 +178,7 @@ export default function TaskCard({ task, index, onTaskClick }) {
 				)}
 			</Draggable>
 
-			{/* ✅ Direct Modal in TaskCard */}
+			{/* ✅ Modal - Yeh same rahega */}
 			{showModal && (
 				<TaskAdderForm
 					onClose={() => setShowModal(false)}
