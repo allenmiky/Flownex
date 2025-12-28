@@ -1,4 +1,4 @@
-import { Tag, Calendar, User, Users, CheckSquare, Check, Flag, Clock, Plus, Edit3, Trash2, File, MessageSquare, MoreHorizontal, X, AlignLeft, GripVertical, AlertCircle, ChevronDown } from "lucide-react";
+import { Tag, Menu, Calendar, User, Users, CheckSquare, Check, Flag, Clock, Plus, Edit3, Trash2, File, MessageSquare, MoreHorizontal, X, AlignLeft, GripVertical, AlertCircle, ChevronDown, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 
 const size = 16;
 
@@ -21,5 +21,10 @@ export const Icons = {
 	Alert: (props) => <AlertCircle size={size} {...props} />,
 	Attachment: (props) => <File size={size} {...props} />,
 	Comment: (props) => <MessageSquare size={size} {...props} />,
-	ChevronDown: (props) => <ChevronDown size={size} {...props} />, // <-- Ye missing tha
+	ChevronDown: (props) => <ChevronDown size={size} {...props} />, 
+	ChevronLeft: (props) => <ChevronLeft size={size} {...props} />, 
+	ChevronRight: (props) => <ChevronRight size={size} {...props} />, 
+	Settings: (props) => <Settings size={size} {...props} />, 
+	Menu: (props) => <Menu size={size} {...props} />, 
+
 };

@@ -203,9 +203,41 @@ body {
 
   display: flex;
   flex-direction: column;
+  gap: 10px;
   padding: 12px;
 
   transition: width 0.3s ease;
+}
+
+.fn-sidebar-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+
+.fn-burger {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.fn-sidebar-logo {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.fn-sidebar-bottom {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.fn-board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .fn-sidebar.collapsed {
@@ -216,16 +248,73 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-
-  padding: 10px 12px;
+  padding: 6px 12px;
   border-radius: var(--radius-md);
-
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-
   color: var(--text-primary);
   transition: background 0.3s ease, transform 0.3s ease;
+}
+
+/* Active */
+.fn-sidebar-item.active {
+  background: rgba(121, 141, 242, 0.18);
+  border-left: 3px solid var(--accent);
+  color: var(--accent);
+}
+
+/* Expand / Collapse */
+.fn-expand {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.fn-expand.open {
+  max-height: 500px;
+}
+
+/* Section headers */
+.fn-toggle {
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.fn-toggle .chevron {
+  color: var(--accent);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+/* Chevron rotate */
+.chevron {
+  transition: transform 0.25s ease;
+}
+
+.fn-toggle .chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Sidebar collapse */
+.fn-sidebar {
+  transition: width 0.3s ease;
+}
+
+/* Bottom toggler */
+.fn-sidebar-toggle {
+  margin-top: auto;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.fn-toggle:hover {
+  color: var(--accent);
 }
 
 .fn-sidebar-item:hover {
@@ -235,6 +324,11 @@ body {
 
 .fn-sidebar-spacer {
   flex: 1;
+}
+
+.fn-add-board {
+  background-color: var(--accent);
+  padding: 10px 40px;
 }
 
 /* =========================
