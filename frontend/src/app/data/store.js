@@ -84,24 +84,77 @@ export const Store = {
 	},
 
 	/* ---------- TASKS ---------- */
-	addTask(boardId, task) {
-		const state = getStateSafe();
-		const board = getBoard(state, boardId);
-		if (!board) return;
+	/* ---------- MERGED addTask ---------- */
+	addTask(boardId, taskData) {
+		const state = this.getState(); // getStateSafe() ki jagah this.getState() use karein
 
-		const column = board.columns.find(
-			c => c.id === (task.status || "todo")
-		);
-		if (!column) return;
+		// 1. Sahi board dhoondein
+		const board = state.boards.find(b => b.id === boardId) || state.boards.find(b => b.id === state.activeBoardId);
+		if (!board) return null;
 
-		column.tasks.push({
+		// 2. Sahi column dhoondein
+		const columnId = taskData.status || "todo";
+		const column = board.columns.find(c => c.id === columnId);
+		if (!column) return null;
+
+		// 3. Merged Task Object (Saare fields ke saath)
+		const newTask = {
 			id: crypto.randomUUID(),
-			title: task.title,
-			status: column.id,
-		});
+			title: taskData.title || "Untitled Task",
+			description: taskData.description || "",
+			status: columnId,
+			// Image UI ke extra fields
+			members: taskData.members || [],
+			labels: taskData.labels || [],
+			checklist: taskData.checklist || [],
+			dueDate: taskData.dueDate || "",
+			priority: taskData.priority || "none",
+			// Metadata
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		};
 
+		// 4. Save and Emit
+		column.tasks.push(newTask);
 		write(state);
-		emit();
+
+		// emit() function agar defined hai toh wo use karein, warna standard event:
+		window.dispatchEvent(new Event("storage-update"));
+
+		return newTask;
+	},
+
+	updateTask(taskId, updates) {
+		const state = this.getState();
+
+		for (const column of state.board.columns) {
+			const index = column.tasks.findIndex(t => t.id === taskId);
+			if (index === -1) continue;
+
+			const task = column.tasks[index];
+
+			if (updates.status && updates.status !== column.id) {
+				column.tasks.splice(index, 1);
+
+				const target = state.board.columns.find(
+					c => c.id === updates.status
+				);
+				if (!target) return false;
+
+				task.status = updates.status;
+				Object.assign(task, updates);
+				task.updatedAt = new Date().toISOString();
+				target.tasks.push(task);
+			} else {
+				Object.assign(task, updates);
+				task.updatedAt = new Date().toISOString();
+			}
+
+			write(state);
+			window.dispatchEvent(new Event("storage-update"));
+			return true;
+		}
+		return false;
 	},
 
 	moveTask(taskId, fromCol, toCol, index, boardId) {
