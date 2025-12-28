@@ -89,12 +89,13 @@ export default function TaskCard({ task, index }) {
 						{/* PRIORITY BAR */}
 						{task.priority && (
 							<div
-								className={`h-1 rounded-full mb-2 ${task.priority === "high"
-									? "bg-red-500"
-									: task.priority === "medium"
+								className={`h-1 rounded-full mb-2 ${
+									task.priority === "high"
+										? "bg-red-500"
+										: task.priority === "medium"
 										? "bg-yellow-400"
 										: "bg-green-500"
-									}`}
+								}`}
 							/>
 						)}
 
@@ -134,7 +135,6 @@ export default function TaskCard({ task, index }) {
 						{showOptions && cardRef.current && (
 							<TaskCardOptions
 								task={task}
-								anchorEl={cardRef.current}
 								onClose={() => setShowOptions(false)}
 								onSelect={handleOptionSelect}
 							/>

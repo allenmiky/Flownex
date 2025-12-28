@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ToastProvider } from "./app/shared/ui/toast/ToastContext";
+import ToastContainer from "./app/shared/ui/toast/ToastContainer";
 import { useState, useEffect } from "react";
 import AppShell from "./app/AppShell";
 import Board from "./app/features/board/Board";
@@ -20,21 +22,24 @@ export default function App() {
 
 	return (
 		<Router>
-			<AppShell boards={boards} setBoards={setBoards}>
-				<Routes>
-					{/* Home page - Board component empty state dikhayega */}
-					<Route
-						path="/"
-						element={<Board />}
-					/>
 
-					{/* Board route */}
-					<Route
-						path="/board/:id"
-						element={<Board />}
-					/>
-				</Routes>
+			<AppShell boards={boards} setBoards={setBoards}>
+				<ToastProvider>
+					<Routes>
+						{/* Home page - Board component empty state dikhayega */}
+						<Route
+							path="/"
+							element={<Board />}
+						/>
+
+						{/* Board route */}
+						<Route
+							path="/board/:id"
+							element={<Board />}
+						/>
+					</Routes>
+				</ToastProvider>
 			</AppShell>
-		</Router>
+		</Router >
 	);
 }
