@@ -1,3 +1,17 @@
+body.task-options-open .task-card {
+  filter: blur(2px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+body.task-options-open .task-card.z-50 {
+  filter: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+
 .logo {
   padding: 0;
   width: 150px;
